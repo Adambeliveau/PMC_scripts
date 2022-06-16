@@ -21,12 +21,12 @@ def make_pie_chart(filename):
 
     plt.figure()
     plt.pie(data['time'], labels=data['Author'], autopct=slice_value)
-    plt.title('Heures travaillées par personne')
+    plt.title(f'Heures travaillées par personne (Total: {total_time:.0f}h)')
     plt.savefig(join(dirname(__file__), f'pie_chart_{datetime.datetime.now().date()}.png'), format='png')
 
 
 def slice_value(x):
-    return f'{(x/100)*total_time:.2f}h ({x:.2f}%)'
+    return f'{(x/100)*total_time:.0f}h ({x:.0f}%)'
 
 
-make_pie_chart('worklogs_backup.csv')
+make_pie_chart('worklogs.csv')
