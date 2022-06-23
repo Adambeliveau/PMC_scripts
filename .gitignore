@@ -1,4 +1,4 @@
 .idea/
-pie_chart/pie_chart*
-pie_chart/bar_chart*
-pie_chart/worklogs*
+bar_chart/pie_chart*
+bar_chart/bar_chart*
+bar_chart/worklogs*
