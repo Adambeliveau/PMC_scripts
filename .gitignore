@@ -1,4 +1,5 @@
 .idea/
-bar_chart/pie_chart*
 bar_chart/bar_chart*
-bar_chart/worklogs*
+*worklogs*
+*timesheet*
+*timelogs*

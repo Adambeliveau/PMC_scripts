@@ -5,8 +5,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 total_time = 0
-estimated_time = int(int((datetime.datetime.now().date() - datetime.datetime.strptime('2022-05-02', '%Y-%m-%d').date()).days / 7)*(945/15))
-
+# estimated_time = int(int((datetime.datetime.now().date() - datetime.datetime.strptime('2022-05-02', '%Y-%m-%d').date()).days / 7)*(945/15))
+estimated_time = 233
 
 def make_pie_chart(filename):
     global total_time
@@ -29,10 +29,10 @@ def make_pie_chart(filename):
             ax.bar(x=f"total de l'équipe: {total_time:.0f}h", height=data.loc[i, 'time'], width=0.5, label=data.loc[i, 'Author'])
         tempsum += data.loc[i, 'time']
 
-    ax.bar(x=f'total estimée: {estimated_time}h', height=estimated_time, width=0.5, label='total estimée')
+    ax.bar(x=f'total estimé: {estimated_time}h', height=estimated_time, width=0.5, label='total estimée')
     ax.bar(x='\n', height=0, width=1)
     ax.legend(loc='upper right')
-    plt.title(f'Heures travaillées par personne (total: {total_time:.2f}h)')
+    plt.title(f'Heures travaillées par personne')
     plt.savefig(join(dirname(__file__), f'bar_chart_{datetime.datetime.now().date()}.png'), format='png')
 
 
