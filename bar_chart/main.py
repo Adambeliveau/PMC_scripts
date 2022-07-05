@@ -1,43 +1,75 @@
+from itertools import permutations
+from os import listdir
 from os.path import dirname, join
 import datetime
+from random import sample
 
+import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
 total_time = 0
-# estimated_time = int(int((datetime.datetime.now().date() - datetime.datetime.strptime('2022-05-02', '%Y-%m-%d').date()).days / 7)*(945/15))
 estimated_time = 233
 
-def make_pie_chart(filename):
-    global total_time
-    data = pd.read_csv(join(dirname(__file__), filename), dtype=object).rename({'Time spent seconds': 'time'}, axis=1)
-    data['time'] = data['time'].astype(int)
-    total_time = data.iloc[-1]['time'] / 3600
-    data.dropna(subset=['Author'], inplace=True)
-    data['time'] = data.groupby('Author')['time'].transform('sum')
-    data.drop_duplicates(['Author'], inplace=True)
-    data = data[['Author', 'time']]
+worklogs = {}
 
-    data['time'] = data['time'].apply(lambda x: int(x) / 3600)
+colors = ['red', 'green', 'blue', 'orange', 'purple', 'yellow', 'pink', 'brown', 'black', 'grey']
 
-    fig, ax = plt.subplots()
-    tempsum = 0
-    for i in data.index:
-        if i > 0:
-            ax.bar(x=f"total de l'équipe: {total_time:.0f}h", height=data.loc[i, 'time'], bottom=tempsum, width=0.5, label=data.loc[i, 'Author'])
-        else:
-            ax.bar(x=f"total de l'équipe: {total_time:.0f}h", height=data.loc[i, 'time'], width=0.5, label=data.loc[i, 'Author'])
-        tempsum += data.loc[i, 'time']
 
-    ax.bar(x=f'total estimé: {estimated_time}h', height=estimated_time, width=0.5, label='total estimée')
-    ax.bar(x='\n', height=0, width=1)
-    ax.legend(loc='upper right')
+def make_pie_chart():
+    global worklogs
+    fig, ax = plt.subplots(figsize=(7, 5))
+    sum_by_author = {'Simon Pelletier': 0,
+                     'Jordan Choquet': 0,
+                     'Adam Beliveau': 0,
+                     'Jonathan Degoede': 0,
+                     'Joaquin Faundez Flores': 0,
+                     'Marie-Eve Castonguay': 0,
+                     'Antoine Laberge': 0}
+    for week, data in worklogs.items():
+        for i in data.index:
+            if week != 'semaine 1':
+                if i == 0:
+                    ax.barh(y=data.loc[i, 'Author'], width=data.loc[i, 'time'], left=sum_by_author[data.loc[i, 'Author']],
+                            height=0.5, label=week, color=colors[int(week[-1])])
+                else:
+                    ax.barh(y=data.loc[i, 'Author'], width=data.loc[i, 'time'], left=sum_by_author[data.loc[i, 'Author']],
+                            height=0.5, color=colors[int(week[-1])])
+                sum_by_author[data.loc[i, 'Author']] += data.loc[i, 'time']
+            else:
+                if i == 0:
+                    ax.barh(y=data.loc[i, 'Author'], width=data.loc[i, 'time'], height=0.5, label=week, color=colors[int(week[-1])])
+                else:
+                    ax.barh(y=data.loc[i, 'Author'], width=data.loc[i, 'time'], height=0.5, color=colors[int(week[-1])])
+                sum_by_author[data.loc[i, 'Author']] = data.loc[i, 'time']
+
+    ax.legend(loc='upper right', bbox_to_anchor=(1.25, 1))
+    ax.set_xlabel('Heures travaillées (h)')
     plt.title(f'Heures travaillées par personne')
-    plt.savefig(join(dirname(__file__), f'bar_chart_{datetime.datetime.now().date()}.png'), format='png')
+    plt.savefig(join(dirname(__file__), f'bar_chart_{datetime.datetime.now().date()}.png'), format='png', bbox_inches="tight")
 
 
 def slice_value(x):
     return f'{(x / 100) * total_time:.2f}h ({x:.2f}%)'
 
 
-make_pie_chart('worklogs.csv')
+def read_csv():
+    global worklogs
+    files = [x for x in listdir(join(dirname(__file__), 'csv')) if x.endswith('.csv')]
+    for file in files:
+        data = pd.read_csv(join(dirname(__file__), 'csv', file), dtype=object).rename({'Time spent seconds': 'time'},
+                                                                                      axis=1)
+        data['time'] = data['time'].astype(int)
+        data.dropna(subset=['Author'], inplace=True)
+        data['time'] = data.groupby('Author')['time'].transform('sum')
+        data.drop_duplicates(['Author'], inplace=True)
+        data = data[['Author', 'time']]
+        data = data.sort_values(by=['Author'], ascending=False)
+
+        data['time'] = data['time'].apply(lambda x: int(x) / 3600)
+
+        worklogs.update({file.rstrip('.csv'): data})
+    worklogs = dict(sorted(worklogs.items(), key=lambda x: x[0][-1]))
+
+read_csv()
+make_pie_chart()
