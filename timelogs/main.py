@@ -1,3 +1,4 @@
+import datetime
 import math
 from datetime import timedelta
 import re
@@ -14,7 +15,9 @@ def split_worklogs(row):
     try:
         if row['Author'] in splited_worklogs.columns and row['Issue'] in splited_worklogs.index:
             splited_worklogs.loc[row['Issue'], row['Author']] += round(int(row['Time spent seconds'])/3600, 2)
-        splited_worklogs.loc[row['Issue'], row['Author']] = round(int(row['Time spent seconds'])/3600, 2)
+        else:
+            splited_worklogs.loc[row['Issue'], row['Author']] = round(int(row['Time spent seconds'])/3600, 2)
+            splited_worklogs.fillna(0, inplace=True)
     except KeyError as e:
         print(e)
 
@@ -29,13 +32,19 @@ def make_timelogs():
     timelogs.rename(columns=lambda x: re.sub(r'Time spent(.*)', 'Total time spent', x), inplace=True)
     timelogs['Estimated time'] = timelogs.apply(lambda x: calculate_estimated_time(x), axis=1)
     timelogs['Progress'] = timelogs['Progress'].apply(lambda x: x + '%')
+    timelogs = timelogs.apply(lambda x: add_id_to_summary(x), axis=1)
     timelogs = timelogs[['Summary', 'Total time spent', 'Estimated time', 'Progress', 'Marie-Eve Castonguay', 'Antoine Laberge', 'Simon Pelletier', 'Jordan Choquet', 'Adam Beliveau', 'Jonathan Degoede', 'Joaquin Faundez Flores']]
-    timelogs.to_csv(join(dirname(__file__), 'timelogs.csv'), index=False)
+    timelogs.to_csv(join(dirname(__file__), f'timelogs_{datetime.date.today()}'), index=False)
 
 
 def calculate_estimated_time(row):
     total_time, progress = convert_to_seconds(row['Total time spent']), row['Progress']
     return str(int(round((total_time / (int(progress) / 100)) / 3600, 0))) + 'h'
+
+
+def add_id_to_summary(row):
+    row['Summary'] = '[' + row.name + '] ' + row['Summary']
+    return row
 
 
 def convert_to_seconds(s):
