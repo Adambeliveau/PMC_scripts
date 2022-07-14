@@ -22,7 +22,7 @@ def split_worklogs(row):
         print(e)
 
 
-worklogs = pd.read_csv(join(dirname(__file__), 'worklogs.csv'), dtype=object)[['Author', 'Issue', 'Time spent seconds']].apply(lambda x: split_worklogs(x), axis=1)
+worklogs = pd.read_csv(join(dirname(__file__), 'semaine 10.csv'), dtype=object)[['Author', 'Issue', 'Time spent seconds']].apply(lambda x: split_worklogs(x), axis=1)
 timesheet = pd.read_csv(join(dirname(__file__), 'timesheet-per-issue.csv'), dtype=object).rename({'Key': 'Issue'}, axis=1).set_index('Issue')
 
 

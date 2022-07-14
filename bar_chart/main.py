@@ -9,7 +9,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 total_time = 0
-estimated_time = 233
+weekly_estimate = 9
 
 worklogs = {}
 
@@ -47,7 +47,7 @@ def make_pie_chart():
                 else:
                     ax.barh(y=data.loc[i, 'Author'], width=data.loc[i, 'time'], height=0.5, color=colors[int(week[8:]) - 1])
                 sum_by_author[data.loc[i, 'Author']] = data.loc[i, 'time']
-        ax.barh(y="Estimation d'heure", width=8, left=(int(week[8:]) - 1)*8, height=0.5, color=colors[int(week[8:]) - 1])
+        ax.barh(y="Estimation d'heure", width=weekly_estimate, left=(int(week[8:]) - 1)*weekly_estimate, height=0.5, color=colors[int(week[8:]) - 1])
 
     ax.legend(loc='upper right', bbox_to_anchor=(1.25, 1))
     ax.set_xlabel('Heures travaillées (h)')
